@@ -124,13 +124,6 @@ DELETE /api/hotspots/:id
 
 MIT License
 
-## 📞 联系方式
 
-如有任何问题或建议，请通过以下方式联系：
-
-- GitHub Issues: [提交问题](https://github.com/your-username/daily-hotspots-tool/issues)
-- Email: your-email@example.com
 
 ---
-
-**Made with ❤️ by Your Name** 
