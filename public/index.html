@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日热点事件整理工具</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- 导航栏 -->
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-fire-alt"></i>
+                    每日热点事件整理工具
+                </a>
+                <button class="btn btn-light" onclick="refreshData()">
+                    <i class="fas fa-sync-alt me-1"></i>
+                    刷新数据
+                </button>
+            </div>
+        </nav>
+
+        <!-- 装饰元素 -->
+        <div class="decoration-circle decoration-circle-1"></div>
+        <div class="decoration-circle decoration-circle-2"></div>
+
+        <div class="row mt-4">
+            <!-- 侧边栏 -->
+            <div class="col-md-3">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-filter"></i>
+                            分类筛选
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <button class="btn btn-primary w-100 mb-3" onclick="filterByCategory('all')">
+                                <i class="fas fa-list-ul me-2"></i>全部热点
+                            </button>
+                            <div id="categoryList" class="mt-3">
+                                <!-- 分类列表将通过JavaScript动态生成 -->
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="mb-2">
+                            <h6 class="mb-3"><i class="fas fa-plus-circle me-2"></i>添加新热点</h6>
+                            <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#addHotspotModal">
+                                <i class="fas fa-plus me-1"></i>
+                                手动添加
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 主要内容区域 -->
+            <div class="col-md-9">
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-newspaper"></i>
+                            热点列表
+                        </h5>
+                        <div class="d-flex align-items-center ms-auto">
+                            <span class="badge bg-primary rounded-pill me-3" id="totalCount">0</span>
+                            <div class="search-container" style="width: 300px;">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" class="form-control" id="searchInput" placeholder="搜索热点...">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="hotspotsList" class="row g-3">
+                            <!-- 热点列表将通过JavaScript动态生成 -->
+                        </div>
+                        
+                        <div class="text-center mt-5" id="loadingSpinner" style="display: none;">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">加载中...</span>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-5" id="loadMoreBtn" style="display: none;">
+                            <button class="btn btn-outline-primary">
+                                <i class="fas fa-chevron-down me-1"></i>
+                                加载更多
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加热点模态框 -->
+    <div class="modal fade" id="addHotspotModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-plus-circle"></i>添加新热点</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addHotspotForm">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">标题 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="content" class="form-label">内容</label>
+                            <textarea class="form-control" id="content" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="category" class="form-label">分类</label>
+                            <select class="form-select" id="category">
+                                <option value="科技">科技</option>
+                                <option value="娱乐">娱乐</option>
+                                <option value="体育">体育</option>
+                                <option value="财经">财经</option>
+                                <option value="社会">社会</option>
+                                <option value="健康">健康</option>
+                                <option value="教育">教育</option>
+                                <option value="国际">国际</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="source" class="form-label">来源</label>
+                            <input type="text" class="form-control" id="source" value="手动添加">
+                        </div>
+                        <div class="mb-3">
+                            <label for="url" class="form-label">链接</label>
+                            <input type="url" class="form-control" id="url" placeholder="https://...">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addHotspot()">
+                        <i class="fas fa-check me-1"></i>添加
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 热点详情模态框 -->
+    <div class="modal fade" id="hotspotDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailTitle"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="detailContent" class="mb-4"></div>
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <div class="time-tag">
+                            <i class="fas fa-tag"></i><span id="detailSource"></span>
+                        </div>
+                        <div class="time-tag">
+                            <i class="far fa-clock"></i><span id="detailTime"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <a href="#" class="btn btn-primary" id="detailUrl" target="_blank">
+                        <i class="fas fa-external-link-alt me-1"></i>查看原文
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast容器 -->
+    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html> 
